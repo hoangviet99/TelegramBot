@@ -3,9 +3,10 @@ const { Headers } = require('node-fetch')
 const tabletojson = require('tabletojson').Tabletojson
 const fs = require("fs")
 const path = require("path")
+require('dotenv').config()
 
 const TelegramBot = require('node-telegram-bot-api')
-const token = '753068368:AAElXsXh_SJd_Fzw_2Sa_W0cKCfrFTeTIsk'
+const token = process.env.BOT_TOKEN
 const botId = 753068368
 var bot = new TelegramBot(token, {polling:true})
 const request = require('request')
