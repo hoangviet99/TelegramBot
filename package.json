@@ -1,0 +1,24 @@
+{
+  "name": "telegrambot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PHV1710303/TelegramBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PHV1710303/TelegramBot/issues"
+  },
+  "homepage": "https://github.com/PHV1710303/TelegramBot#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+    "node-telegram-bot-api": "^0.50.0",
+    "tabletojson": "^2.0.4"
+  }
+}
