@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/PHV1710303/TelegramBot#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "node-fetch": "^2.6.0",
     "node-telegram-bot-api": "^0.50.0",
     "tabletojson": "^2.0.4"
