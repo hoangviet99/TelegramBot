@@ -56,7 +56,6 @@ const getYearAndTermStudy = () => {
     yearStudy = `${year - 1}-${year}`
     termID = `HK03`
   } else {
-    console.log(`${year}-${year + 1}`)
     yearStudy = `${year}-${year + 1}`
     termID = `HK01`
   }
@@ -84,8 +83,8 @@ bot.onText(/^!echo (.+)/, function(msg, match){
 bot.onText(/^!send (.+)/, function(msg, match){
     let message = match[1]
     let name = msg.from.first_name + " " + msg.from.last_name
-    if(message.includes('all')){
-        message = message.slice(message.indexOf('all') + 3).trim()
+    if(message.includes('[all]')){
+        message = message.slice(message.indexOf('[all]') + 3).trim()
         message += '\n\nGửi bởi: ' + name;
         if(message !== ''){
             sendMessageFromBotToGroup('all', message)
@@ -106,18 +105,18 @@ bot.onText(/^!send (.+)/, function(msg, match){
         }
     }
     else{
-        bot.sendMessage(msg.chat.id, 'Sai cú pháp send\n!send [tên nhóm] Nội dung gửi\n!send [tên nhóm 1, tên nhóm 2, ...] Nội dung gửi\nGửi tất cả các nhóm: !send all Nội dung gửi')
+        bot.sendMessage(msg.chat.id, 'Sai cú pháp send\n!send [tên nhóm] Nội dung gửi\n!send [tên nhóm 1, tên nhóm 2, ...] Nội dung gửi\nGửi tất cả các nhóm: !send [all] Nội dung gửi')
     }
 })
 
 bot.onText(/^!sendpic (.+)/, function(msg, match){
     let message = match[1]
     let name = msg.from.first_name + " " + msg.from.last_name
-    if(message.includes('all')){
-        message = message.slice(message.indexOf('all') + 3).trim()
+    if(message.includes('[all]')){
+        message = message.slice(message.indexOf('[all]') + 3).trim()
         message += '\n\nGửi bởi: ' + name;
         if(message !== ''){
-            sendPhotoFromBotToGroup('all', message)
+            sendDataFromBotToGroup('all', message, 'photo')
         }
         else{
             bot.sendMessage(msg.chat.id, 'Chưa nhập vào nội dung cần gửi đi')
@@ -128,14 +127,43 @@ bot.onText(/^!sendpic (.+)/, function(msg, match){
         message = message.slice(message.indexOf(']') + 1).trim()
         // message += '\n\nGửi bởi: ' + name;
         if(message !== ''){
-            sendPhotoFromBotToGroup(groupName, message)
+            sendDataFromBotToGroup(groupName, message, 'photo')
         }
         else{
             bot.sendMessage(msg.chat.id, 'Chưa nhập vào nội dung cần gửi đi')
         }
     }
     else{
-        bot.sendMessage(msg.chat.id, 'Sai cú pháp send\n!sendpic [tên nhóm] Nội dung gửi\n!sendpic [tên nhóm 1, tên nhóm 2, ...] Nội dung gửi\nGửi tất cả các nhóm: !sendpic all Nội dung gửi')
+        bot.sendMessage(msg.chat.id, 'Sai cú pháp sendpic\n!sendpic [tên nhóm] Nội dung gửi\n!sendpic [tên nhóm 1, tên nhóm 2, ...] Nội dung gửi\nGửi tất cả các nhóm: !sendpic [all] Nội dung gửi')
+    }
+})
+
+bot.onText(/^!sendvideo (.+)/, function(msg, match){
+    let message = match[1]
+    let name = msg.from.first_name + " " + msg.from.last_name
+    if(message.includes('[all]')){
+        message = message.slice(message.indexOf('all') + 3).trim()
+        message += '\n\nGửi bởi: ' + name;
+        if(message !== ''){
+            sendDataFromBotToGroup('[all]', message, 'video')
+        }
+        else{
+            bot.sendMessage(msg.chat.id, 'Chưa nhập vào nội dung cần gửi đi')
+        }
+    }
+    else if(message.includes('[') && message.includes(']')){
+        let groupName = message.slice(message.indexOf('[') + 1, message.indexOf(']'))
+        message = message.slice(message.indexOf(']') + 1).trim()
+        // message += '\n\nGửi bởi: ' + name;
+        if(message !== ''){
+            sendDataFromBotToGroup(groupName, message, 'video')
+        }
+        else{
+            bot.sendMessage(msg.chat.id, 'Chưa nhập vào nội dung cần gửi đi')
+        }
+    }
+    else{
+        bot.sendMessage(msg.chat.id, 'Sai cú pháp sendvideo\n!sendvideo [tên nhóm] Nội dung gửi\n!sendvideo [tên nhóm 1, tên nhóm 2, ...] Nội dung gửi\nGửi tất cả các nhóm: !sendpic [all] Nội dung gửi')
     }
 })
 
@@ -237,26 +265,106 @@ bot.onText(/^!phim (.+)/, function(msg, match){
     })
 })
 
+bot.onText(/^!tkb$/, async function(msg, match) {
+    var chatId = msg.chat.id;
+    let text = 'Cú pháp xem thời khóa biểu:\n' +
+        '!tkb [MSSV|Mã lớp] [Năm học] [Học kỳ] [Số tuần]\n' +
+        'Trong đó:\n[Năm học] ở dạng 20xx-20xx\n' +
+        '[Học kỳ]: hk01 | hk02 | hk03\n' +
+        '[Số tuần]: Là số tuần trong năm, từ 1 -> 52\n' +
+        'Ví dụ:\n!tkb 1710303 2020-2021 hk01 37\n' +
+        '!tkb CTK41-PM 2020-2021 hk01 37\n' +
+        'P/s: Nếu chỉ có mssv hoặc mã lớp, sẽ tự động lấy năm, học kỳ và tuần hiện tại.'
+    bot.sendMessage(chatId, text)
+})
+
 bot.onText(/^!tkb (.+)/, async function(msg, match){
-    var text = match[1]
-    var chatId = msg.chat.id
+    let text = match[1]
+    let chatId = msg.chat.id
     
     let arrText = text.split(' ')
+    text = 'Cú pháp xem thời khóa biểu:\n' +
+    '!tkb [MSSV|Mã lớp] [Năm học] [Học kỳ] [Số tuần]\n' +
+    'Trong đó:\n[Năm học] ở dạng 20xx-20xx\n' +
+    '[Học kỳ]: hk01 | hk02 | hk03\n' +
+    '[Số tuần]: Là số tuần trong năm, từ 1 -> 52\n' +
+    'Ví dụ:\n!tkb 1710303 2020-2021 hk01 37\n' +
+    '!tkb CTK41-PM 2020-2021 hk01 37\n' +
+    'P/s: Nếu chỉ có mssv hoặc mã lớp, sẽ tự động lấy năm, học kỳ và tuần hiện tại.'
     let idImport = arrText[0]
     let yearImport = arrText[1]
     let termImport = arrText[2]
     let weekImport = arrText[3]
+    if(arrText.length > 1) {
+        if(!yearImportRegex.test(yearImport) || !termImportRegex.test(termImport)) {
+            bot.sendMessage(chatId, text)
+            return
+        }
+    }
+    bot.sendMessage(chatId, 'Dạ chờ em một tý...')
     let schedule = await getSchedule(idImport, yearImport, termImport, weekImport)
 
     if(schedule !== ''){
         schedule = JSON.parse(schedule)
         let result = handleScheduleJSON(schedule)
         bot.sendMessage(chatId, result)
-    }
-    else {
-        bot.sendMessage(chatId, 'Nhập sai cú pháp rồi')
+    } else {
+        bot.sendMessage(chatId, 'Sai mã lớp hoặc mã số sinh viên!')
     }
 })
+
+/*
+setInterval(() => {
+    let idBotHome = -442266279;
+    let idBGateA1 =-1001471914174;
+    let idBGate = -393620216;
+
+    let text = "";
+    let d = new Date();
+    let dateOfWeek = d.getDay();
+    let second = d.getSeconds();
+    let minute = d.getMinutes();
+    let hour = d.getUTCHours();
+
+    if(second > 5) {
+        return;
+    }
+
+    if((hour += 7) >= 23) {
+        hour %= 24;
+        dateOfWeek = ++dateOfWeek % 7;
+    }
+
+    if(dateOfWeek !== 0) {
+        if(hour === 8 && minute === 0) {
+            text = "8 giờ sáng rồi, cả nhà bắt đầu công việc thôi nào. ✊✌️";
+            bot.sendMessage(idBGateA1, text);
+            bot.sendMessage(idBGate, text);
+        }
+        if(hour === 12 && minute === 0) {
+            text = "12 giờ trưa rồi, về nghỉ ngơi thôi các ae. 😪😪";
+            bot.sendMessage(idBGateA1, text);
+            bot.sendMessage(idBGate, text);
+        }
+        if(hour === 14 && minute === 0) {
+            text = "2 giờ chiều rồi, quay lại với công việc nào. 💪💪";
+            bot.sendMessage(idBGateA1, text);
+            bot.sendMessage(idBGate, text);
+        }
+        if(hour === 18 && minute === 0) {
+            text = "6 giờ tối, kết thúc ngày làm việc rồi, về nghỉ ngơi thôi các ae. 🥱😴";
+            bot.sendMessage(idBGateA1, text);
+            bot.sendMessage(idBGate, text);
+        }
+      }
+
+      if(hour === 6 && minute === 0) {
+        text = "6 giờ sáng rồi, dậy thôi cậu chủ ơi 🤩✌️" + minute;
+        bot.sendMessage(idBotHome, text);
+      }
+}, 4999);
+*/
+//============================================================================================================================
 
 function checkRoom(msg, typeToCheck){
     let answer = ''
@@ -315,7 +423,7 @@ function sendMessageFromBotToGroup(groupName, message){
         }
     }
     else{
-        listGroup = groupName.split(',');
+        let listGroup = groupName.split(',');
         for(let obj of items){
             let item = obj.split('|')
             for(let group of listGroup){
@@ -328,7 +436,7 @@ function sendMessageFromBotToGroup(groupName, message){
     }
 }
 
-function sendPhotoFromBotToGroup(groupName, message){
+function sendDataFromBotToGroup(groupName, message, typeOfData){
     const data = fs.readFileSync('./name.txt', {encoding:'utf8'})
     let items = data.split('\n')
     items.pop()
@@ -337,22 +445,42 @@ function sendPhotoFromBotToGroup(groupName, message){
     let cap = message.split(' ')
     cap.shift();
     cap = cap.join(' ')
-    console.log(url + ' | ' + message)
+    console.log(url + ' | ' + cap)
 
     if(groupName === 'all'){
         for(let obj of items){
             let item = obj.split('|')
-            bot.sendPhoto(item[0], url, {caption: cap})
+            switch(typeOfData) {
+                case 'photo':
+                bot.sendPhoto(item[0], url, {caption: cap})
+                    break;
+                case 'video':
+                    bot.sendVideo(item[0], url, {caption: cap})
+                    break;
+                case 'voice':
+                    bot.sendVoice(item[0], url, {caption: cap})
+                    break;
+            }
         }
     }
     else{
-        listGroup = groupName.split(',');
+        let listGroup = groupName.split(',');
         for(let obj of items){
             let item = obj.split('|')
             for(let group of listGroup){
                 group = group.trim();
                 if(item[1] === group){
-                    bot.sendPhoto(item[0], url, {caption: cap})
+                    switch(typeOfData) {
+                        case 'photo':
+                        bot.sendPhoto(item[0], url, {caption: cap})
+                            break;
+                        case 'video':
+                            bot.sendVideo(item[0], url, {caption: cap})
+                            break;
+                        case 'voice':
+                            bot.sendVoice(item[0], url, {caption: cap})
+                            break;
+                    }
                 }
             }
         }
@@ -417,10 +545,20 @@ async function handleDataScheduleToJSON() {
 
 function handleScheduleJSON(schedule){
     let output = '===================='
+    let prefix = ''
+    const fileHTML = fs.readFileSync(
+        path.resolve(__dirname, './index.html'),
+        { encoding: "UTF-8" }
+    )
+    let dateAndName = processHTMLStringGetNameAndDate(fileHTML)
+    if(dateAndName[0] !== '') {
+        prefix = '\n' + dateAndName[0] + '\n' + dateAndName[1] + '\n'
+    } else {
+        prefix = '\n' + dateAndName[1] + '\n'
+    }
     let str = ''
     for(let i = 1; i < schedule.length; i++){
         let item = schedule[i]
-        str = ''
         str += '\n' + item['0'] + '\n--------------------'
         if(item['Sáng'] !== ''){
             str += '\nSáng\n--------------------'
@@ -440,13 +578,14 @@ function handleScheduleJSON(schedule){
         
         if(str !== ''){
             output += str + '\n===================='
+            str = '';
         }
     }
 
     if(output === '===================='){
-        return 'Không có lịch học tuần này'
+        return prefix + '====================\n' + 'Không có lịch học tuần này'
     }
-    return output
+    return prefix + output
 }
 
 function handleScheduleEntry(inputEntry){
@@ -454,7 +593,7 @@ function handleScheduleEntry(inputEntry){
     let list = inputEntry.split('   ')
     let output = ''
     for(let i = 0; i < list.length; i++){
-        if(i !== 0){
+        if(i > 0){
             output += '\n--------------------\n'
         }
         let str = []
@@ -468,6 +607,27 @@ function handleScheduleEntry(inputEntry){
     }
 
     return output
+}
+
+function processHTMLStringGetNameAndDate(htlmString) {
+    let arrString = htlmString.split('span')
+    let arrOutput = []
+    arrOutput.push(decodeDecimalNCRtoUnicode(arrString[1]))
+    arrOutput.push(decodeDecimalNCRtoUnicode(arrString[3]))
+    for(let i = 0; i < arrOutput.length; i++) {
+        arrOutput[i] = arrOutput[i].slice(arrOutput[i].indexOf('>') + 1, arrOutput[i].indexOf('<'))
+    }
+    return arrOutput
+}
+
+function decodeDecimalNCRtoUnicode(text) {
+    return text
+        .replace(/&#(\d+);/g, function(match, num) {
+            return String.fromCodePoint(num);
+        })
+        .replace(/&#x([A-Za-z0-9]+);/g, function(match, num) {
+            return String.fromCodePoint(parseInt(num, 16));
+        });
 }
 
 /*
